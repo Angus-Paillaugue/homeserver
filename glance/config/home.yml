@@ -1,0 +1,128 @@
+- name: Home
+  # Optionally, if you only have a single page you can hide the desktop navigation for a cleaner look
+  hide-desktop-navigation: true
+  columns:
+    - size: small
+      widgets:
+        - type: calendar
+          first-day-of-week: monday
+
+        - type: weather
+          location: Ramonville-saint-agne, France
+          units: metric
+          hour-format: 24h
+          # hide-location: true
+
+        - type: releases
+          cache: 12h
+          # Without authentication the Github API allows for up to 60 requests per hour. You can create a
+          # read-only token from your Github account settings and use it here to increase the limit.
+          token: ${GITHUB_TOKEN}
+          repositories:
+            - immich-app/immich
+            - glanceapp/glance
+            - sveltejs/svelte
+            - sveltejs/kit
+            - dani-garcia/vaultwarden
+
+    - size: full
+      widgets:
+        - type: monitor
+          cache: 1m
+          title: Services
+          sites:
+            - title: Jellyfin
+              url: http://192.168.0.3:8080
+              icon: /assets/jellyfin-logo.png
+            - title: Immich
+              url: http://192.168.0.3:8082
+              icon: /assets/immich-logo.png
+            - title: AdGuard Home
+              url: http://192.168.0.3:8088
+              icon: /assets/adguard-logo.png
+            - title: Vaultwarden
+              url: http://192.168.0.3:8081
+              icon: /assets/vaultwarden-logo.png
+            - title: Home Assistant
+              url: http://192.168.0.2:8123
+              icon: /assets/home-assistant-logo.png
+            - title: Nextcloud
+              url: https://nextcloud.paillaugue.fr
+              icon: /assets/nextcloud-logo.png
+            - title: Open WebUI
+              url: http://192.168.0.3:8084/
+              icon: /assets/open-webui-logo.png
+
+
+
+        - type: videos
+          channels:
+            - UChJof4NntaxU1VoJI8zt-Kw # Zeddic
+            - UCMPtzN8fnhHLpihCT1QvFZw # cam shand
+            - UC6wpjLSLn2dhlaDjn6_V0rw # Joy of Code
+            - UClbAm32dh0WmRLaqZlpGyCw # Kris8an
+            - UCsBjURrPoezykLs9EqgamOA # Fireship
+            - UC2Xd-TjJByJyK2w1zNwY0zQ # Beyond Fireship
+            - UC9x0AN7BWHpCDHSm9NiJFJQ # NetworkChuck
+            - UCFAiFyGs6oDiF1Nf-rRJpZA # Technoblade
+            - UC1irENajwVYATt9hf5rfWRQ # Rich Harris
+            - UC3mZJ--J4GZMGD8K_x3kbgQ # Ma boi (superconeri)
+            - UCCU1lqASccmJaVVHA5DH9Ag # joestyler123 (xjonkuch)
+            - UCYGjxo5ifuhnmvhPvCc3DJQ # Wankil Studio
+            - UC9FkeEFIGd9FXRfxpTltXYA # Luke TheNotable
+            - UCX6OQ3DkcsbYNE6H8uQQuVA # MrBeast
+            - UCXuqSBlHAE6Xw-yeJA0Tunw # Linus Tech Tips
+
+        - type: group
+          widgets:
+            - type: reddit
+              subreddit: selfhosted
+              show-thumbnails: true
+            - type: reddit
+              subreddit: sveltejs
+              show-thumbnails: true
+            - type: reddit
+              subreddit: degoogle
+              show-thumbnails: true
+
+    - size: small
+      widgets:
+        - type: bookmarks
+          groups:
+            - links:
+                - title: Amazon
+                  target: _top
+                  icon: di:amazon-light
+                  url: https://amazon.fr
+                - title: Open WebUI
+                  target: _top
+                  icon: di:open-webui-light
+                  url: http://192.168.0.3:8084
+                - title: Translate
+                  target: _top
+                  icon: di:google-translate
+                  url: https://translate.disroot.org/
+                - title: Drive
+                  target: _top
+                  icon: di:google-drive
+                  url: https://drive.google.com/drive/
+            - title: Development
+              links:
+                - title: Lucide Icons
+                  target: _top
+                  icon: si:lucide
+                  url: https://lucide.dev/icons/
+                - title: Cloudflare Tunnels
+                  target: _top
+                  icon: di:cloudflare-zero-trust
+                  url: https://one.dash.cloudflare.com/92f5796f7fdf0c37529d5c39b8670c8f/networks/tunnels
+                - title: Github
+                  target: _top
+                  icon: di:github-light
+                  url: https://github.com/
+
+        - type: dns-stats
+          service: adguard
+          url: http://192.168.0.3:8088
+          username: ${ADGUARD_USERNAME}
+          password: ${ADGUARD_PASSWORD}

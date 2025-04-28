@@ -1,0 +1,272 @@
+services:
+  adguardhome:
+    image: 'adguard/adguardhome:latest'
+    container_name: adguard
+    hostname: 'adguard'
+    restart: 'unless-stopped'
+    # network_mode: host
+    volumes:
+      - '/etc/localtime:/etc/localtime:ro'
+      - './adguard/work:/opt/adguardhome/work'
+      - './adguard/config:/opt/adguardhome/conf'
+    ports:
+      # Plain DNS
+      - '53:53/tcp'
+      - '53:53/udp'
+      # AdGuard Home Admin Panel as well as DNS-over-HTTPS
+      - '8088:80/tcp'
+      - '4434:443/tcp'
+      - '443:443/udp'
+      - '3000:3000/tcp'
+      # DNS-over-TLS
+      - '853:853/tcp'
+      # DNS-over-QUIC
+      - '784:784/udp'
+      - '853:853/udp'
+      - '8853:8853/udp'
+      # DNSCrypt
+      - '5443:5443/tcp'
+      - '5443:5443/udp'
+
+  jellyfin:
+    image: jellyfin/jellyfin
+    container_name: jellyfin
+    network_mode: 'host'
+    environment:
+      - TZ=${TZ}
+      - NVIDIA_VISIBLE_DEVICES=all
+    volumes:
+      - ./Jellyfin/jellyfin-config:/config
+      - ./Jellyfin/jellyfin-cache:/cache
+      - type: bind
+        source: /mnt/hdd2/Jellyfin/Movies
+        target: /Movies
+      - type: bind
+        source: /mnt/hdd2/Jellyfin/Shows
+        target: /Show
+    restart: 'unless-stopped'
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+
+  # sonarr:
+  #   image: linuxserver/sonarr
+  #   container_name: sonarr
+  #   ports:
+  #     - "8989:8989"
+  #   volumes:
+  #     - ./sonarr-config:/config
+  #     - /mnt/hdd2/Jellyfin/Incomplete:/downloads
+  #     - /mnt/hdd2/Jellyfin/Shows:/shows
+  #   environment:
+  #     - PUID=1000
+  #     - PGID=1000
+  #     - TZ=${TZ}
+  #   restart: unless-stopped
+
+  # radarr:
+  #   image: linuxserver/radarr
+  #   container_name: radarr
+  #   ports:
+  #     - "7878:7878"
+  #   volumes:
+  #     - ./radarr-config:/config
+  #     - /mnt/hdd2/Jellyfin/Movies:/movies
+  #     - /mnt/hdd2/Jellyfin/Incomplete:/downloads
+  #   environment:
+  #     - PUID=1000
+  #     - PGID=1000
+  #     - TZ=${TZ}
+  #   restart: unless-stopped
+
+  # bazarr:
+  #   image: linuxserver/bazarr
+  #   container_name: bazarr
+  #   ports:
+  #     - "6767:6767"
+  #   volumes:
+  #     - ./bazarr-config:/config
+  #     - /mnt/hdd2/Jellyfin/Movies:/movies
+  #   environment:
+  #     - PUID=1000
+  #     - PGID=1000
+  #     - TZ=${TZ}
+  #   restart: unless-stopped
+
+  vpn:
+    container_name: vpn
+    image: qmcgaw/gluetun:v3.38.0
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    environment:
+      - VPN_SERVICE_PROVIDER=surfshark
+      - VPN_TYPE=wireguard
+      - WIREGUARD_PRIVATE_KEY=${WIREGUARD_PRIVATE_KEY}
+      - WIREGUARD_ADDRESSES=10.14.0.2/16
+      - SERVER_COUNTRIES=France
+    ports:
+      - 9091:9091
+    restart: unless-stopped
+
+  transmission:
+    image: lscr.io/linuxserver/transmission:latest
+    container_name: transmission
+    network_mode: service:vpn
+    depends_on:
+      - vpn
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TZ}
+    volumes:
+      - ./Jellyfin/transmission-config:/config
+      - /mnt/hdd2/Jellyfin/Incomplete:/Incomplete
+      - /mnt/hdd2/Jellyfin/Movies:/Movies
+      - /mnt/hdd2/Jellyfin/Shows:/Shows
+      - /mnt/hdd2/Jellyfin/Others:/Others
+    restart: unless-stopped
+
+  openwebui:
+    container_name: open-webui
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    image: ghcr.io/open-webui/open-webui:main
+    ports:
+      - "8084:8080"
+    volumes:
+      - ./open-webui/open-webui:/app/backend/data
+
+  ollama:
+    image: ollama/ollama
+    container_name: openwebui-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ./open-webui/ollama:/root/.ollama
+
+  portainer-ce:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    ports:
+      - 8085:9443
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./portainer/portainer_data:/data
+    restart: unless-stopped
+
+  vaultwarden:
+    image: vaultwarden/server:latest
+    container_name: vaultwarden
+    restart: unless-stopped
+    environment:
+      DOMAIN: "http://localhost:8081"
+    volumes:
+      - ./vaultwarden/vw-data/:/data/
+    ports:
+      - 8081:80
+
+  nextcloud-aio-mastercontainer:
+    image: nextcloud/all-in-one:latest
+    init: true
+    # restart: always
+    container_name: nextcloud-aio-mastercontainer
+    volumes:
+      - nextcloud_aio_mastercontainer:/mnt/docker-aio-config
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - 8087:8080
+    environment:
+      APACHE_PORT: 11000
+      APACHE_IP_BINDING: 127.0.0.1
+      SKIP_DOMAIN_VALIDATION: true
+
+  glance:
+    container_name: glance
+    image: glanceapp/glance
+    restart: unless-stopped
+    volumes:
+      - ./glance/config:/app/config
+      - ./glance/assets:/app/assets
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - 8089:8080
+    env_file: ./glance/.env
+
+  immich-server:
+    container_name: immich_server
+    image: ghcr.io/immich-app/immich-server:${IMMICH_IMMICH_VERSION:-release}
+    # extends:
+    #   file: hwaccel.transcoding.yml
+    #   service: cpu # set to one of [nvenc, quicksync, rkmpp, vaapi, vaapi-wsl] for accelerated transcoding
+    volumes:
+      # Do not edit the next line. If you want to change the media storage location on your system, edit the value of IMMICH_UPLOAD_LOCATION in the .env file
+      - ${IMMICH_UPLOAD_LOCATION}:/usr/src/app/upload
+      - /etc/localtime:/etc/localtime:ro
+    env_file:
+      - .env
+    ports:
+      - 8082:2283
+    depends_on:
+      - redis
+      - database
+    restart: always
+    healthcheck:
+      disable: false
+
+  immich-machine-learning:
+    container_name: immich_machine_learning
+    # For hardware acceleration, add one of -[armnn, cuda, openvino] to the image tag.
+    # Example tag: ${IMMICH_IMMICH_VERSION:-release}-cuda
+    image: ghcr.io/immich-app/immich-machine-learning:${IMMICH_IMMICH_VERSION:-release}
+    # extends: # uncomment this section for hardware acceleration - see https://immich.app/docs/features/ml-hardware-acceleration
+    #   file: hwaccel.ml.yml
+    #   service: cpu # set to one of [armnn, cuda, openvino, openvino-wsl] for accelerated inference - use the `-wsl` version for WSL2 where applicable
+    volumes:
+      - model-cache:/cache
+    env_file:
+      - .env
+    restart: always
+    healthcheck:
+      disable: false
+
+  redis:
+    container_name: immich_redis
+    image: docker.io/redis:6.2-alpine@sha256:2d1463258f2764328496376f5d965f20c6a67f66ea2b06dc42af351f75248792
+    healthcheck:
+      test: redis-cli ping || exit 1
+    restart: always
+
+  database:
+    container_name: immich_postgres
+    image: docker.io/tensorchord/pgvecto-rs:pg14-v0.2.0@sha256:90724186f0a3517cf6914295b5ab410db9ce23190a2d9d0b9dd6463e3fa298f0
+    environment:
+      POSTGRES_PASSWORD: ${IMMICH_DB_PASSWORD}
+      POSTGRES_USER: ${IMMICH_DB_USERNAME}
+      POSTGRES_DB: ${IMMICH_DB_DATABASE_NAME}
+      POSTGRES_INITDB_ARGS: '--data-checksums'
+    volumes:
+      # Do not edit the next line. If you want to change the database storage location on your system, edit the value of DB_DATA_LOCATION in the .env file
+      - ${IMMICH_DB_DATA_LOCATION}:/var/lib/postgresql/data
+    healthcheck:
+      test: pg_isready --dbname='${IMMICH_DB_DATABASE_NAME}' --username='${IMMICH_DB_USERNAME}' || exit 1; Chksum="$$(psql --dbname='${IMMICH_DB_DATABASE_NAME}' --username='${IMMICH_DB_USERNAME}' --tuples-only --no-align --command='SELECT COALESCE(SUM(checksum_failures), 0) FROM pg_stat_database')"; echo "checksum failure count is $$Chksum"; [ "$$Chksum" = '0' ] || exit 1
+      interval: 5m
+      start_interval: 30s
+      start_period: 5m
+    command: ["postgres", "-c", "shared_preload_libraries=vectors.so", "-c", 'search_path="$$user", public, vectors', "-c", "logging_collector=on", "-c", "max_wal_size=2GB", "-c", "shared_buffers=512MB", "-c", "wal_compression=on"]
+    restart: always
+
+
+
+volumes:
+  nextcloud_aio_mastercontainer:
+    name: nextcloud_aio_mastercontainer
+  model-cache:
