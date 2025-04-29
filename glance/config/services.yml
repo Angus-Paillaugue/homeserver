@@ -33,3 +33,29 @@
 
         - type: docker-containers
           hide-by-default: true
+
+        - type: monitor
+          cache: 1m
+          title: TV
+          sites:
+            - title: Transmission
+              url: http://192.168.0.3:8083
+              icon: di:transmission
+            - title: Jellyfin
+              url: http://192.168.0.3:8080
+              icon: di:jellyfin
+            - title: Sonarr
+              url: http://192.168.0.3:8090
+              icon: di:sonarr
+            - title: Radarr
+              url: http://192.168.0.3:8091
+              icon: di:radarr
+            - title: Bazarr
+              url: http://192.168.0.3:8092
+              icon: di:bazarr
+            - title: Jackett
+              url: http://192.168.0.3:8093/UI/Dashboard
+              icon: di:jackett
+            - title: Jellyseerr
+              url: http://192.168.0.3:8094
+              icon: di:jellyseerr

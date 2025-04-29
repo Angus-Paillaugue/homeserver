@@ -61,52 +61,114 @@ services:
       glance.name: Jellyfin
       glance.icon: si:jellyfin
       glance.url: http://192.168.0.3:8080
+      glance.parent: jellyfin
       glance.description: Media server
       glance.hide: false
 
-  # sonarr:
-  #   image: linuxserver/sonarr
-  #   container_name: sonarr
-  #   ports:
-  #     - "8989:8989"
-  #   volumes:
-  #     - ./sonarr-config:/config
-  #     - /mnt/hdd2/Jellyfin/Incomplete:/downloads
-  #     - /mnt/hdd2/Jellyfin/Shows:/shows
-  #   environment:
-  #     - PUID=1000
-  #     - PGID=1000
-  #     - TZ=${TZ}
-  #   restart: unless-stopped
+  sonarr:
+    image: linuxserver/sonarr
+    container_name: sonarr
+    ports:
+      - "8090:8989"
+    volumes:
+      - ./Jellyfin/sonarr-config:/config
+      - /mnt/hdd2/Jellyfin/Incomplete:/downloads
+      - /mnt/hdd2/Jellyfin/Shows:/shows
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TZ}
+    restart: unless-stopped
+    labels:
+      glance.name: Sonarr
+      glance.icon: si:sonarr
+      glance.url: http://192.168.0.3:8090
+      glance.parent: jellyfin
+      glance.description: TV show downloader
+      glance.hide: false
 
-  # radarr:
-  #   image: linuxserver/radarr
-  #   container_name: radarr
-  #   ports:
-  #     - "7878:7878"
-  #   volumes:
-  #     - ./radarr-config:/config
-  #     - /mnt/hdd2/Jellyfin/Movies:/movies
-  #     - /mnt/hdd2/Jellyfin/Incomplete:/downloads
-  #   environment:
-  #     - PUID=1000
-  #     - PGID=1000
-  #     - TZ=${TZ}
-  #   restart: unless-stopped
+  radarr:
+    image: linuxserver/radarr
+    container_name: radarr
+    ports:
+      - "8091:7878"
+    volumes:
+      - ./Jellyfin/radarr-config:/config
+      - /mnt/hdd2/Jellyfin/Movies:/movies
+      - /mnt/hdd2/Jellyfin/Incomplete:/downloads
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TZ}
+    restart: unless-stopped
+    labels:
+      glance.name: Radarr
+      glance.icon: si:radarr
+      glance.url: http://192.168.0.3:8091
+      glance.parent: jellyfin
+      glance.description: Movie downloader
+      glance.hide: false
 
-  # bazarr:
-  #   image: linuxserver/bazarr
-  #   container_name: bazarr
-  #   ports:
-  #     - "6767:6767"
-  #   volumes:
-  #     - ./bazarr-config:/config
-  #     - /mnt/hdd2/Jellyfin/Movies:/movies
-  #   environment:
-  #     - PUID=1000
-  #     - PGID=1000
-  #     - TZ=${TZ}
-  #   restart: unless-stopped
+  bazarr:
+    image: linuxserver/bazarr
+    container_name: bazarr
+    ports:
+      - "8092:6767"
+    volumes:
+      - ./Jellyfin/bazarr-config:/config
+      - /mnt/hdd2/Jellyfin/Movies:/movies
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TZ}
+    restart: unless-stopped
+    labels:
+      glance.name: Bazarr
+      glance.icon: si:bazarr
+      glance.url: http://192.168.0.3:8092
+      glance.parent: jellyfin
+      glance.description: Subtitle downloader
+      glance.hide: false
+
+  jackett:
+    image: linuxserver/jackett
+    container_name: jackett
+    ports:
+      - "8093:9117"
+    volumes:
+      - ./Jellyfin/jackett-config:/config
+      - /mnt/hdd2/Jellyfin/Incomplete:/downloads
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TZ}
+    restart: unless-stopped
+    labels:
+      glance.name: Jackett
+      glance.icon: si:jackett
+      glance.url: http://192.168.0.3:8093
+      glance.parent: jellyfin
+      glance.description: Torrent indexer
+      glance.hide: false
+
+  jellyseerr:
+    image: ghcr.io/fallenbagel/jellyseerr:latest
+    container_name: jellyseerr
+    environment:
+      - LOG_LEVEL=debug
+      - TZ=${TZ}
+    ports:
+      - 8094:5055
+    volumes:
+      - ./Jellyfin/jellyseerr-config/config:/app/config
+    restart: unless-stopped
+    labels:
+      glance.name: Jellyseerr
+      glance.icon: si:jellyseerr
+      glance.url: http://192.168.0.3:8094
+      glance.parent: jellyfin
+      glance.description: Movie & TV show request manager
+      glance.hide: false
 
   vpn:
     container_name: vpn

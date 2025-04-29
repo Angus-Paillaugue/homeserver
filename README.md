@@ -22,6 +22,33 @@ This repository manages a collection of self-hosted services running on a single
  - **Mounts**: Movies, Shows
  - **GPU Support**: Yes (via NVIDIA_VISIBLE_DEVICES)
 
+### 🎥 Sonarr
+  - **Purpose**: Automated TV show downloader and organizer.
+  - **UI**: http://192.168.0.3:8090
+  - **Mounts**: Shows
+
+### 🎥 Radarr
+ - **Purpose**: Automated movie downloader and organizer.
+ - **UI**: http://192.168.0.3:8091
+ - **Mounts**: Movies
+
+### 🎥 Bazarr
+  - **Purpose**: Subtitle management for Sonarr and Radarr.
+  - **UI**: http://192.168.0.3:8092
+  - **Mounts**: Shows, Movies
+  - **Dependencies**: Sonarr, Radarr
+  - **Language**: French, English
+  - **Subtitles**: OpenSubtitles
+
+### 🎥 Jackett
+  - **Purpose**: Proxy server for torrent indexers.
+  - **UI**: http://192.168.0.3:8093
+
+### 🎥 Jellyseerr
+  - **Purpose**: Movie & TV show request manager for Jellyfin.
+  - **UI**: http://192.168.0.3:8094
+  - **Dependencies**: Jellyfin, Sonarr, Radarr
+
 ### 🧲 Transmission (via VPN)
  - **Purpose**: Torrent client routed through a VPN container (Surfshark with WireGuard).
  - **UI**: http://192.168.0.3:8083
