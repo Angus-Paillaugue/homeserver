@@ -1,0 +1,35 @@
+- name: Services
+  columns:
+    - size: full
+      widgets:
+        - type: monitor
+          cache: 1m
+          title: Services
+          sites:
+            - title: Home Assistant
+              url: http://192.168.0.2:8123
+              icon: di:home-assistant
+            - title: AdGuard Home
+              url: http://192.168.0.3:8088
+              icon: di:adguard-home
+            - title: Immich
+              url: http://192.168.0.3:8082
+              icon: di:immich
+            - title: Nextcloud
+              url: https://nextcloud.paillaugue.fr
+              icon: di:nextcloud
+            - title: Jellyfin
+              url: http://192.168.0.3:8080
+              icon: di:jellyfin
+            - title: Vaultwarden
+              url: http://192.168.0.3:8081
+              icon: di:vaultwarden
+            - title: Open WebUI
+              url: http://192.168.0.3:8084/
+              icon: di:open-webui-light
+            - title: 4get
+              url: http://192.168.0.3:8090/
+              icon: di:google
+
+        - type: docker-containers
+          hide-by-default: true

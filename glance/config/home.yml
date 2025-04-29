@@ -1,6 +1,6 @@
 - name: Home
   # Optionally, if you only have a single page you can hide the desktop navigation for a cleaner look
-  hide-desktop-navigation: true
+  # hide-desktop-navigation: true
   columns:
     - size: small
       widgets:
@@ -31,31 +31,34 @@
           cache: 1m
           title: Services
           sites:
-            - title: Jellyfin
-              url: http://192.168.0.3:8080
-              icon: /assets/jellyfin-logo.png
-            - title: Immich
-              url: http://192.168.0.3:8082
-              icon: /assets/immich-logo.png
-            - title: AdGuard Home
-              url: http://192.168.0.3:8088
-              icon: /assets/adguard-logo.png
-            - title: Vaultwarden
-              url: http://192.168.0.3:8081
-              icon: /assets/vaultwarden-logo.png
             - title: Home Assistant
               url: http://192.168.0.2:8123
-              icon: /assets/home-assistant-logo.png
+              icon: di:home-assistant
+            - title: AdGuard Home
+              url: http://192.168.0.3:8088
+              icon: di:adguard-home
+            - title: Immich
+              url: http://192.168.0.3:8082
+              icon: di:immich
             - title: Nextcloud
               url: https://nextcloud.paillaugue.fr
-              icon: /assets/nextcloud-logo.png
+              icon: di:nextcloud
+            - title: Jellyfin
+              url: http://192.168.0.3:8080
+              icon: di:jellyfin
+            - title: Vaultwarden
+              url: http://192.168.0.3:8081
+              icon: di:vaultwarden
             - title: Open WebUI
               url: http://192.168.0.3:8084/
-              icon: /assets/open-webui-logo.png
-
-
+              icon: di:open-webui-light
+            - title: 4get
+              url: http://192.168.0.3:8090/
+              icon: di:google
 
         - type: videos
+          style: grid-cards
+          collapse-after-rows: 2
           channels:
             - UChJof4NntaxU1VoJI8zt-Kw # Zeddic
             - UCMPtzN8fnhHLpihCT1QvFZw # cam shand
@@ -126,3 +129,16 @@
           url: http://192.168.0.3:8088
           username: ${ADGUARD_USERNAME}
           password: ${ADGUARD_PASSWORD}
+
+        - type: server-stats
+          servers:
+            - type: local
+              name: Server
+              hide-mountpoints-by-default: true
+              mountpoints:
+                "/":
+                  hide: false
+                "/mnt/hdd":
+                  hide: false
+                "/mnt/hdd2":
+                  hide: false
