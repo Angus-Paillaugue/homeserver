@@ -35,7 +35,7 @@
               url: http://192.168.0.2:8123
               icon: di:home-assistant
             - title: AdGuard Home
-              url: http://192.168.0.3:8088
+              url: http://192.168.0.3:8085
               icon: di:adguard-home
             - title: Immich
               url: http://192.168.0.3:8082
@@ -53,7 +53,7 @@
               url: http://192.168.0.3:8084/
               icon: di:open-webui-light
             - title: 4get
-              url: http://192.168.0.3:8090/
+              url: http://192.168.0.3:8089/
               icon: di:google
 
         - type: videos
@@ -126,7 +126,7 @@
 
         - type: dns-stats
           service: adguard
-          url: http://192.168.0.3:8088
+          url: http://192.168.0.3:8085
           username: ${ADGUARD_USERNAME}
           password: ${ADGUARD_PASSWORD}
 

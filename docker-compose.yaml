@@ -14,7 +14,7 @@ services:
       - '53:53/tcp'
       - '53:53/udp'
       # AdGuard Home Admin Panel as well as DNS-over-HTTPS
-      - '8088:80/tcp'
+      - '8085:80/tcp'
       - '4434:443/tcp'
       - '443:443/udp'
       - '3000:3000/tcp'
@@ -30,7 +30,7 @@ services:
     labels:
       glance.name: AdGuard Home
       glance.icon: si:adguard
-      glance.url: http://192.168.0.3:8088
+      glance.url: http://192.168.0.3:8087
       glance.description: DNS adblocker
       glance.hide: false
 
@@ -122,7 +122,7 @@ services:
       - WIREGUARD_ADDRESSES=10.14.0.2/16
       - SERVER_COUNTRIES=France
     ports:
-      - 9091:9091
+      - 8083:9091
     restart: unless-stopped
     labels:
       glance.name: VPN
@@ -151,7 +151,7 @@ services:
     labels:
       glance.name: Transmission
       glance.icon: si:transmission
-      glance.url: http://192.168.0.3:9091
+      glance.url: http://192.168.0.3:8083
       glance.description: Torrent client
       glance.parent: jellyfin
       glance.hide: false
@@ -241,12 +241,12 @@ services:
       - /mnt/hdd:/mnt/hdd:ro
       - /mnt/hdd2:/mnt/hdd2:ro
     ports:
-      - 8089:8080
+      - 8088:8080
     env_file: ./glance/.env
     labels:
       glance.name: Glance
       glance.icon: di:glance-light
-      glance.url: http://192.168.0.3:8089
+      glance.url: http://192.168.0.3:8088
       glance.description: New tab page for your browser
       glance.hide: false
 
@@ -282,10 +282,10 @@ services:
     container_name: immich_machine_learning
     # For hardware acceleration, add one of -[armnn, cuda, openvino] to the image tag.
     # Example tag: ${IMMICH_IMMICH_VERSION:-release}-cuda
-    image: ghcr.io/immich-app/immich-machine-learning:${IMMICH_IMMICH_VERSION:-release}
-    # extends: # uncomment this section for hardware acceleration - see https://immich.app/docs/features/ml-hardware-acceleration
-    #   file: hwaccel.ml.yml
-    #   service: cpu # set to one of [armnn, cuda, openvino, openvino-wsl] for accelerated inference - use the `-wsl` version for WSL2 where applicable
+    image: ghcr.io/immich-app/immich-machine-learning:${IMMICH_IMMICH_VERSION:-release}-cuda
+    extends: # uncomment this section for hardware acceleration - see https://immich.app/docs/features/ml-hardware-acceleration
+      file: hwaccel.ml.yml
+      service: cuda # set to one of [armnn, cuda, openvino, openvino-wsl] for accelerated inference - use the `-wsl` version for WSL2 where applicable
     volumes:
       - model-cache:/cache
     env_file:
@@ -322,7 +322,6 @@ services:
       glance.name: DB
       glance.hide: false
     volumes:
-      # Do not edit the next line. If you want to change the database storage location on your system, edit the value of DB_DATA_LOCATION in the .env file
       - ${IMMICH_DB_DATA_LOCATION}:/var/lib/postgresql/data
     healthcheck:
       test: pg_isready --dbname='${IMMICH_DB_DATABASE_NAME}' --username='${IMMICH_DB_USERNAME}' || exit 1; Chksum="$$(psql --dbname='${IMMICH_DB_DATABASE_NAME}' --username='${IMMICH_DB_USERNAME}' --tuples-only --no-align --command='SELECT COALESCE(SUM(checksum_failures), 0) FROM pg_stat_database')"; echo "checksum failure count is $$Chksum"; [ "$$Chksum" = '0' ] || exit 1
@@ -338,14 +337,14 @@ services:
     restart: unless-stopped
     environment:
       - FOURGET_PROTO=http
-      - FOURGET_SERVER_NAME=4get.ca
+      - FOURGET_SERVER_NAME=Angus's server
     ports:
-      - "8091:80"
+      - "8089:80"
     labels:
       glance.name: 4get
       glance.hide: false
       glance.icon: si:google
-      glance.url: http://192.168.0.3:8090
+      glance.url: http://192.168.0.3:8089
       glance.description: Search engine
 
 volumes:
