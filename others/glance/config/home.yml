@@ -32,28 +32,28 @@
           title: Services
           sites:
             - title: Home Assistant
-              url: http://192.168.0.2:8123
+              url: http://ha.lan:8123
               icon: di:home-assistant
             - title: AdGuard Home
-              url: http://192.168.0.3:8085
+              url: http://192.168.0.1:3000
               icon: di:adguard-home
             - title: Immich
-              url: http://192.168.0.3:8082
+              url: http://vega.lan:8082
               icon: di:immich
             - title: Nextcloud
               url: https://nextcloud.paillaugue.fr
               icon: di:nextcloud
             - title: Jellyfin
-              url: http://192.168.0.3:8080
+              url: http://mars.lan:8080
               icon: di:jellyfin
             - title: Vaultwarden
-              url: http://192.168.0.3:8081
+              url: http://vega.lan:8081
               icon: di:vaultwarden
             - title: Open WebUI
-              url: http://192.168.0.3:8084/
+              url: http://saturn.lan:8084/
               icon: di:open-webui-light
             - title: 4get
-              url: http://192.168.0.3:8089/
+              url: http://saturn.lan:8089/
               icon: di:google
 
         - type: videos
@@ -100,7 +100,7 @@
                 - title: Open WebUI
                   target: _top
                   icon: di:open-webui-light
-                  url: http://192.168.0.3:8084
+                  url: http://saturn.lan:8084
                 - title: Translate
                   target: _top
                   icon: di:google-translate
@@ -124,11 +124,11 @@
                   icon: di:github-light
                   url: https://github.com/
 
-        - type: dns-stats
-          service: adguard
-          url: http://192.168.0.3:8085
-          username: ${ADGUARD_USERNAME}
-          password: ${ADGUARD_PASSWORD}
+        # - type: dns-stats
+        #   service: adguard
+        #   url: http://192.168.0.1:3000
+        #   username: ${ADGUARD_USERNAME}
+        #   password: ${ADGUARD_PASSWORD}
 
         - type: server-stats
           servers:

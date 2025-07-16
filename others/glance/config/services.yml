@@ -7,55 +7,55 @@
           title: Services
           sites:
             - title: Home Assistant
-              url: http://192.168.0.2:8123
+              url: http://ha.lan:8123
               icon: di:home-assistant
             - title: AdGuard Home
-              url: http://192.168.0.3:8085
+              url: http://192.168.0.1:3000
               icon: di:adguard-home
             - title: Immich
-              url: http://192.168.0.3:8082
+              url: http://vega.lan:8082
               icon: di:immich
             - title: Nextcloud
               url: https://nextcloud.paillaugue.fr
               icon: di:nextcloud
             - title: Jellyfin
-              url: http://192.168.0.3:8080
+              url: http://mars.lan:8080
               icon: di:jellyfin
             - title: Vaultwarden
-              url: http://192.168.0.3:8081
+              url: http://vega.lan:8081
               icon: di:vaultwarden
             - title: Open WebUI
-              url: http://192.168.0.3:8084/
+              url: http://saturn.lan:8084/
               icon: di:open-webui-light
             - title: 4get
-              url: http://192.168.0.3:8089/
+              url: http://saturn.lan:8089/
               icon: di:google
-
-        - type: docker-containers
-          hide-by-default: true
 
         - type: monitor
           cache: 1m
           title: TV
           sites:
             - title: Transmission
-              url: http://192.168.0.3:8083
+              url: http://mars.lan:8083
               icon: di:transmission
             - title: Jellyfin
-              url: http://192.168.0.3:8080
+              url: http://mars.lan:8080
               icon: di:jellyfin
             - title: Sonarr
-              url: http://192.168.0.3:8090
+              url: http://mars.lan:8090
               icon: di:sonarr
             - title: Radarr
-              url: http://192.168.0.3:8091
+              url: http://mars.lan:8091
               icon: di:radarr
             - title: Bazarr
-              url: http://192.168.0.3:8092
+              url: http://mars.lan:8092
               icon: di:bazarr
             - title: Jackett
-              url: http://192.168.0.3:8093/UI/Dashboard
+              url: http://mars.lan:8093/UI/Dashboard
               icon: di:jackett
+            - title: Prowlarr
+              url: http://mars.lan:8096
+              icon: di:prowlarr
             - title: Jellyseerr
-              url: http://192.168.0.3:8094
+              url: http://mars.lan:8094
               icon: di:jellyseerr

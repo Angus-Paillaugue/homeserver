@@ -1,0 +1,131 @@
+services:
+  vaultwarden:
+    image: vaultwarden/server:latest
+    container_name: vaultwarden
+    restart: unless-stopped
+    environment:
+      DOMAIN: "http://localhost:8081"
+    volumes:
+      - ./vaultwarden/vw-data/:/data/
+    ports:
+      - 8081:80
+    labels:
+      glance.name: Vaultwarden
+      glance.icon: si:vaultwarden
+      glance.url: http://192.168.0.3:8081
+      glance.description: Password manager
+      glance.hide: false
+
+  nextcloud-aio-mastercontainer:
+    image: nextcloud/all-in-one:latest
+    init: true
+    network_mode: bridge
+    # restart: always
+    container_name: nextcloud-aio-mastercontainer
+    volumes:
+      - nextcloud_aio_mastercontainer:/mnt/docker-aio-config
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - 8087:8080
+    environment:
+      APACHE_PORT: 11000
+      APACHE_IP_BINDING: 127.0.0.1
+      SKIP_DOMAIN_VALIDATION: true
+      NEXTCLOUD_MOUNT: "/mnt/"
+    labels:
+      glance.name: Nextcloud
+      glance.icon: si:nextcloud
+      glance.url: https://nextcloud.paillaugue.fr
+      glance.description: Nextcloud
+      glance.hide: false
+
+  immich-server:
+    container_name: immich_server
+    image: ghcr.io/immich-app/immich-server:${IMMICH_IMMICH_VERSION:-release}
+    # extends:
+    #   file: hwaccel.transcoding.yml
+    #   service: cpu # set to one of [nvenc, quicksync, rkmpp, vaapi, vaapi-wsl] for accelerated transcoding
+    volumes:
+      # Do not edit the next line. If you want to change the media storage location on your system, edit the value of IMMICH_UPLOAD_LOCATION in the .env file
+      - ${IMMICH_UPLOAD_LOCATION}:/usr/src/app/upload
+      - /etc/localtime:/etc/localtime:ro
+    env_file:
+      - .env
+    ports:
+      - 8082:2283
+    depends_on:
+      - redis
+      - database
+    restart: always
+    healthcheck:
+      disable: false
+    labels:
+      glance.name: Immich
+      glance.icon: si:immich
+      glance.url: http://192.168.0.3:8082
+      glance.description: Image & video management
+      glance.id: immich
+      glance.hide: false
+
+  immich-machine-learning:
+    container_name: immich_machine_learning
+    # For hardware acceleration, add one of -[armnn, cuda, openvino] to the image tag.
+    # Example tag: ${IMMICH_IMMICH_VERSION:-release}-cuda
+    image: ghcr.io/immich-app/immich-machine-learning:${IMMICH_IMMICH_VERSION:-release}
+    # extends: # uncomment this section for hardware acceleration - see https://immich.app/docs/features/ml-hardware-acceleration
+      # file: hwaccel.ml.yml
+      # service: cuda # set to one of [armnn, cuda, openvino, openvino-wsl] for accelerated inference - use the `-wsl` version for WSL2 where applicable
+    volumes:
+      - model-cache:/cache
+    env_file:
+      - .env
+    restart: always
+    healthcheck:
+      disable: false
+    labels:
+      glance.parent: immich
+      glance.name: Machine Learning
+      glance.hide: false
+
+  redis:
+    container_name: immich_redis
+    image: docker.io/redis:6.2-alpine@sha256:2d1463258f2764328496376f5d965f20c6a67f66ea2b06dc42af351f75248792
+    healthcheck:
+      test: redis-cli ping || exit 1
+    restart: always
+    labels:
+      glance.parent: immich
+      glance.name: Redis
+      glance.hide: false
+
+  database:
+    container_name: immich_postgres
+    image: ghcr.io/immich-app/postgres:14-vectorchord0.3.0-pgvectors0.2.0
+    user: "0"
+    environment:
+      POSTGRES_PASSWORD: ${IMMICH_DB_PASSWORD}
+      POSTGRES_USER: ${IMMICH_DB_USERNAME}
+      POSTGRES_DB: ${IMMICH_DB_DATABASE_NAME}
+      POSTGRES_INITDB_ARGS: '--data-checksums'
+      DB_STORAGE_TYPE: 'HDD'
+    labels:
+      glance.parent: immich
+      glance.name: DB
+      glance.hide: false
+    volumes:
+      - ${IMMICH_DB_DATA_LOCATION}:/var/lib/postgresql/data
+    restart: always
+
+  couldflared:
+    container_name: cloudflared
+    image: cloudflare/cloudflared
+    restart: unless-stopped
+    command: tunnel run
+    network_mode: 'host'
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN}
+
+volumes:
+  nextcloud_aio_mastercontainer:
+    name: nextcloud_aio_mastercontainer
+  model-cache:
