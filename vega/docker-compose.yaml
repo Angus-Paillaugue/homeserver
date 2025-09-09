@@ -9,35 +9,24 @@ services:
       - ./vaultwarden/vw-data/:/data/
     ports:
       - 8081:80
-    labels:
-      glance.name: Vaultwarden
-      glance.icon: si:vaultwarden
-      glance.url: http://192.168.0.3:8081
-      glance.description: Password manager
-      glance.hide: false
 
-  nextcloud-aio-mastercontainer:
-    image: nextcloud/all-in-one:latest
-    init: true
-    network_mode: bridge
-    # restart: always
-    container_name: nextcloud-aio-mastercontainer
-    volumes:
-      - nextcloud_aio_mastercontainer:/mnt/docker-aio-config
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    ports:
-      - 8087:8080
-    environment:
-      APACHE_PORT: 11000
-      APACHE_IP_BINDING: 127.0.0.1
-      SKIP_DOMAIN_VALIDATION: true
-      NEXTCLOUD_MOUNT: "/mnt/"
-    labels:
-      glance.name: Nextcloud
-      glance.icon: si:nextcloud
-      glance.url: https://nextcloud.paillaugue.fr
-      glance.description: Nextcloud
-      glance.hide: false
+#  nextcloud-aio-mastercontainer:
+#    image: nextcloud/all-in-one:latest
+#    init: true
+#    network_mode: bridge
+#    # restart: always
+#    container_name: nextcloud-aio-mastercontainer
+#    volumes:
+#      - nextcloud_aio_mastercontainer:/mnt/docker-aio-config
+#      - /var/run/docker.sock:/var/run/docker.sock:ro
+#      - /dev/fuse:/dev/fuse
+#    ports:
+#      - 8087:8080
+#    environment:
+#      APACHE_PORT: 11000
+#      APACHE_IP_BINDING: 127.0.0.1
+#      SKIP_DOMAIN_VALIDATION: true
+#      NEXTCLOUD_MOUNT: "/mnt/"
 
   immich-server:
     container_name: immich_server
@@ -59,13 +48,6 @@ services:
     restart: always
     healthcheck:
       disable: false
-    labels:
-      glance.name: Immich
-      glance.icon: si:immich
-      glance.url: http://192.168.0.3:8082
-      glance.description: Image & video management
-      glance.id: immich
-      glance.hide: false
 
   immich-machine-learning:
     container_name: immich_machine_learning
@@ -82,10 +64,6 @@ services:
     restart: always
     healthcheck:
       disable: false
-    labels:
-      glance.parent: immich
-      glance.name: Machine Learning
-      glance.hide: false
 
   redis:
     container_name: immich_redis
@@ -93,10 +71,6 @@ services:
     healthcheck:
       test: redis-cli ping || exit 1
     restart: always
-    labels:
-      glance.parent: immich
-      glance.name: Redis
-      glance.hide: false
 
   database:
     container_name: immich_postgres
@@ -108,9 +82,6 @@ services:
       POSTGRES_DB: ${IMMICH_DB_DATABASE_NAME}
       POSTGRES_INITDB_ARGS: '--data-checksums'
       DB_STORAGE_TYPE: 'HDD'
-    labels:
-      glance.parent: immich
-      glance.name: DB
       glance.hide: false
     volumes:
       - ${IMMICH_DB_DATA_LOCATION}:/var/lib/postgresql/data
@@ -126,6 +97,6 @@ services:
       TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN}
 
 volumes:
-  nextcloud_aio_mastercontainer:
-    name: nextcloud_aio_mastercontainer
+#  nextcloud_aio_mastercontainer:
+#    name: nextcloud_aio_mastercontainer
   model-cache:

@@ -24,6 +24,11 @@
             - sveltejs/svelte
             - sveltejs/kit
             - dani-garcia/vaultwarden
+            - open-webui/open-webui
+            - jellyfin/jellyfin
+            - fallenbagel/jellyseerr
+            - binwiederhier/ntfy
+            - nextcloud/all-in-one
 
     - size: full
       widgets:
@@ -32,29 +37,53 @@
           title: Services
           sites:
             - title: Home Assistant
-              url: http://ha.lan:8123
+              url: https://ha.home.lan
               icon: di:home-assistant
+              allow-insecure: true
             - title: AdGuard Home
-              url: http://192.168.0.1:3000
+              url: https://adguard.home.lan
               icon: di:adguard-home
+              allow-insecure: true
+            - title: AdGuard Home
+              url: https://proxy-manager.home.lan
+              icon: di:nginx-proxy-manager
+              allow-insecure: true
             - title: Immich
-              url: http://vega.lan:8082
+              url: https://immich.home.lan
               icon: di:immich
+              allow-insecure: true
             - title: Nextcloud
               url: https://nextcloud.paillaugue.fr
               icon: di:nextcloud
+              allow-insecure: true
             - title: Jellyfin
-              url: http://mars.lan:8080
+              url: https://jellyfin.home.lan
               icon: di:jellyfin
+              allow-insecure: true
             - title: Vaultwarden
-              url: http://vega.lan:8081
+              url: https://vaultwarden.home.lan
               icon: di:vaultwarden
+              allow-insecure: true
             - title: Open WebUI
-              url: http://saturn.lan:8084/
+              url: https://openwebui.home.lan
               icon: di:open-webui-light
+              allow-insecure: true
             - title: 4get
-              url: http://saturn.lan:8089/
+              url: https://search.home.lan/
               icon: di:google
+              allow-insecure: true
+            - title: Navidrome
+              url: https://navidrome.home.lan
+              icon: di:navidrome
+              allow-insecure: true
+            - title: Wikipedia
+              url: https://wikipedia.home.lan
+              icon: di:wikipedia
+              allow-insecure: true
+            - title: Libretranslate
+              url: https://libretranslate.home.lan
+              icon: di:google-translate
+              allow-insecure: true
 
         - type: videos
           style: grid-cards
@@ -100,11 +129,11 @@
                 - title: Open WebUI
                   target: _top
                   icon: di:open-webui-light
-                  url: http://saturn.lan:8084
+                  url: https://openwebui.home.lan
                 - title: Translate
                   target: _top
                   icon: di:google-translate
-                  url: https://translate.disroot.org/
+                  url: https://libretranslate.home.lan/
                 - title: Drive
                   target: _top
                   icon: di:google-drive
@@ -124,11 +153,11 @@
                   icon: di:github-light
                   url: https://github.com/
 
-        # - type: dns-stats
-        #   service: adguard
-        #   url: http://192.168.0.1:3000
-        #   username: ${ADGUARD_USERNAME}
-        #   password: ${ADGUARD_PASSWORD}
+        - type: dns-stats
+          service: adguard
+          url: http://192.168.0.12
+          username: ${ADGUARD_USERNAME}
+          password: ${ADGUARD_PASSWORD}
 
         - type: server-stats
           servers:

@@ -1,4 +1,18 @@
 services:
+  navidrome:
+    image: deluan/navidrome:latest
+    container_name: navidrome
+    user: 0:0
+    ports:
+      - "8098:4533"
+    restart: unless-stopped
+    environment:
+      - ND_LOGLEVEL=debug
+      - ND_ENABLEINSIGHTSCOLLECTOR=false
+    volumes:
+      - "./navidrome:/data"
+      - "/mnt/hdd2/Music:/music:ro"
+
   jellyfin:
     image: jellyfin/jellyfin
     container_name: jellyfin
@@ -69,21 +83,6 @@ services:
       - PGID=0
       - TZ=${TZ}
     restart: unless-stopped
-
-  # lidarr:
-  #   image: linuxserver/lidarr
-  #   container_name: lidarr
-  #   ports:
-  #     - "8095:8686"
-  #   volumes:
-  #     - ./Jellyfin/lidarr-config:/config
-  #     - /mnt/hdd2/Jellyfin/Music:/Music
-  #     - /mnt/hdd2/Jellyfin/Incomplete:/downloads
-  #   environment:
-  #     - PUID=0
-  #     - PGID=0
-  #     - TZ=${TZ}
-  #   restart: unless-stopped
 
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:latest
@@ -158,6 +157,15 @@ services:
       - /mnt/hdd2/Jellyfin/Others:/Others
     restart: unless-stopped
 
+  watcharr:
+    image: ghcr.io/sbondco/watcharr:latest
+    container_name: watcharr
+    ports:
+      - 8099:3080
+    volumes:
+      - ./watcharr:/data
+    restart: unless-stopped
+
   ntfy:
     image: binwiederhier/ntfy:v2.11.0
     container_name: ntfy
@@ -179,4 +187,3 @@ services:
     ports:
       - 8097:80
     restart: unless-stopped
-

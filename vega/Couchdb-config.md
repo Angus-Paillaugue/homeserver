@@ -1,0 +1,10 @@
+
+# Docs
+
+[Github link](https://github.com/vrtmrz/obsidian-livesync/)
+
+# Config
+ - URI: `obsidian://setuplivesync?settings=%256fe55d9b5a4f8837c0932581010000001cc28776e1a2672d474084fa10f61a35ECzjs025p%2F6dVyqokQ5%2FIzQBb9AygHxtIjuU8kbQQWjlYr30nKGY9yD%2FGGkkaufOPBJIaetH1P4Lo0karhYRO32%2Fkt5Z2TqnOKknBYzTlxnXqB2xWHzkIGcLfkWNIyN%2FRlR6vNi1ZsdhbnP8Q6onAWXJ7tiRB9CEsUM3tgyL2qAy5SLbs40miXWYkime25R67hrZ2oYsynWjq6R1ZwYqjazzk%2BJx7I6qnrg9BoPlfh7c043gmqXF7H%2Bk1SR7jP8PJXDEvF7yrQMxJVkiXScgwuSlu9NcQGk5q7RcDEnKe2OZtOr9BqTALL5KAzaay9mpx9SNqLyJouw9zuXH5flwk0xJIYq7jJYIi%2B%2FCafDz2DGcIDnvhT3KrAWlU27lDJ0vxLX%2BHc4KF9OxT9GDD7UokHbpcsBFYdUyKLw1DsrTbo6QfLEfy5ICyQU5zUTS5wcIzOFzYoJ1DVHvSspKEv%2FTLqGaSQftDTpTGYZEnx%2BgoW%2BmkfdPvxc30wr%2FJpNMio7MBIR%2B5L1sv%2BHzRW9bNW5qMnglGSIgPU0HpnV9yYkVqj%2FLXMXYg%2FWcP0Eyn4ZXTD6RmOAVgxr2JEy7bYje8M5NpfWqk3OgDm4FMwgLs90npTQlsYOzl%2Fn%2BEbFvbtSN3RoLqiLNQ12N1CRuepoZNNxXbvMiPY8KUm1ekTzebGRZ8pNsuKw%3D`
+ - Passphrase: `spring-silence`
+ - Password: `APAILL40`
+ - Username: `angus`

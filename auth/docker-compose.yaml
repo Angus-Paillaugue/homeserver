@@ -1,0 +1,27 @@
+services:
+  tinyauth:
+    image: ghcr.io/steveiliop56/tinyauth:v3
+    container_name: tinyauth
+    environment:
+      - SECRET=${TINYAUTH_SECRET}
+      - APP_URL=http://tinyauth.home.lan
+      - COOKIE_DOMAIN=.home.lan
+      - USERS=${TINYAUTH_USERS}
+    volumes:
+      - ./tinyauth-data:/data
+    restart: unless-stopped
+
+  traefik:
+    image: traefik:v3.3
+    container_name: traefik
+    ports:
+      - 80:80
+      - 443:443
+    restart: unless-stopped
+    command:
+      - --configFile=/etc/traefik/traefik.yml
+    volumes:
+      - ./dynamic.yaml:/etc/traefik/dynamic.yml:ro
+      - ./traefik.yaml:/etc/traefik/traefik.yml:ro
+      - ./ca/certs/home.lan.chain.pem:/certs/home.lan.crt.pem:ro
+      - ./ca/private/home.lan.key.pem:/certs/home.lan.key.pem
