@@ -1,45 +1,53 @@
 
-networks:
-  minecraft-network:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.18.0.0/16
+#networks:
+#  minecraft-network:
+#    driver: bridge
+#    ipam:
+#      config:
+#        - subnet: 172.18.0.0/16
 
 services:
-  lazymc:
-    image: ghcr.io/joesturge/lazymc-docker-proxy:latest
-    container_name: proxy
-    networks:
-      minecraft-network:
-        ipv4_address: 172.18.0.2
-    restart: unless-stopped
-    volumes:
-      - data:/server:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    ports:
-      - "25565:25565"
+#  lazymc:
+#    image: ghcr.io/joesturge/lazymc-docker-proxy:latest
+#    container_name: proxy
+#    networks:
+#      minecraft-network:
+#        ipv4_address: 172.18.0.2
+#    restart: unless-stopped
+#    volumes:
+#      - data:/server:ro
+#      - /var/run/docker.sock:/var/run/docker.sock:ro
+#    ports:
+#      - "25565:25565"
 
   vanilla:
     image: itzg/minecraft-server
     container_name: vanilla
-    networks:
-      minecraft-network:
-        ipv4_address: 172.18.0.3
-    labels:
-      - lazymc.enabled=true
-      - lazymc.group=vanilla
-      - lazymc.server.address=mc:25565
+#    networks:
+#      minecraft-network:
+#        ipv4_address: 172.18.0.3
+#    labels:
+#      - lazymc.enabled=true
+#      - lazymc.group=vanilla
+#      - lazymc.server.address=mc:25565
     tty: true
     stdin_open: true
     restart: no
     environment:
-      EULA: "TRUE"
-      MEMORY: "2G"
-      VERSION: "1.21.6"
+      EULA: TRUE
+      MEMORY: 2G
+      VERSION: 1.21.6
       MOTD: "My survival server"
+      MODRINTH_DOWNLOAD_DEPENDENCIES: required
+      MODRINTH_PROJECTS: |
+        fabric-api
+        toms-storage:YTzOMaus
+        chunk-loaders:Tu5ARCZQ
+      TYPE: FABRIC
     volumes:
       - ./vanilla:/data
-
-volumes:
-  data:
+    ports:
+      - "25565:25565"
+      
+# volumes:
+#   data:

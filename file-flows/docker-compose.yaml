@@ -1,0 +1,21 @@
+services:
+  fileflows:
+    image: revenz/fileflows
+    restart: unless-stopped
+    container_name: file-flows
+    ports:
+      - "5000:5000"
+    environment:
+      - TZ=Eurome/Paris
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu, compute, utility]
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./data:/app/Data
+      - /mnt/storage/Jellyfin/Porn:/Jellyfin/Porn
+      - ./common:/app/common

@@ -1,0 +1,13 @@
+services:
+  frontend:
+    image: anguspllg/tisseo:latest
+    restart: always
+    ports:
+      - 9106:3000
+    environment:
+      - PORT=3000
+    env_file:
+      - .env
+    volumes:
+      - ./config:/app/config
+networks: {}

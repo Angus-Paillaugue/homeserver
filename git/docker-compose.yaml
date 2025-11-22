@@ -13,7 +13,7 @@ services:
       - GITEA__database__HOST=db:5432
       - GITEA__database__NAME=gitea
       - GITEA__database__USER=gitea
-      - GITEA__database__PASSWD=gitea
+      - GITEA__database__PASSWD=${POSTGRES_PASSWORD}
     restart: always
     networks:
       - gitea
@@ -22,7 +22,7 @@ services:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     ports:
-      - "80:3000"
+      - "4323:3000"
       - "222:22"
     depends_on:
       - db
@@ -32,9 +32,38 @@ services:
     restart: always
     environment:
       - POSTGRES_USER=gitea
-      - POSTGRES_PASSWORD=gitea
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=gitea
     networks:
       - gitea
     volumes:
       - ./postgres:/var/lib/postgresql/data
+
+  gitea-mirror:
+    image: ghcr.io/raylabshq/gitea-mirror:latest
+    container_name: gitea-mirror
+    restart: unless-stopped
+    ports:
+      - "4321:4321"
+    user: 0:0
+    volumes:
+      - ./gitea-mirror:/app/data
+    environment:
+      # === ABSOLUTELY REQUIRED ===
+      # This MUST be set and CANNOT be changed via UI
+      - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
+      - BETTER_AUTH_URL=https://gitea-mirror.home.paillaugue.fr
+      - BETTER_AUTH_TRUSTED_ORIGINS=https://gitea-mirror.home.paillaugue.fr
+      # === CORE SETTINGS ===
+      # These are technically required but have working defaults
+      - NODE_ENV=production
+      - DATABASE_URL=file:data/gitea-mirror.db
+      - HOST=0.0.0.0
+      - PORT=4321
+      - PUBLIC_BETTER_AUTH_URL=https://gitea-mirror.home.paillaugue.fr
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=3", "--spider", "http://localhost:4321/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 15s

@@ -18,16 +18,17 @@ services:
   webserver:
     image: ghcr.io/paperless-ngx/paperless-ngx:latest
     restart: unless-stopped
+    user: 0:0
     depends_on:
       - db
       - broker
       - gotenberg
       - tika
     ports:
-      - "8000:8000"
+      - "8104:8000"
     volumes:
-      - /mnt/hdd2/docker/paperless/data:/usr/src/paperless/data
-      - /mnt/hdd2/docker/paperless//media:/usr/src/paperless/media
+      - ./data:/usr/src/paperless/data
+      - ./media:/usr/src/paperless/media
       - ./export:/usr/src/paperless/export
       - ./consume:/usr/src/paperless/consume
     env_file: .env
@@ -38,6 +39,29 @@ services:
       PAPERLESS_TIKA_ENABLED: 1
       PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://gotenberg:3000
       PAPERLESS_TIKA_ENDPOINT: http://tika:9998
+      PAPERLESS_ENABLE_ALLAUTH: true
+      PAPERLESS_APPS: allauth.socialaccount.providers.openid_connect
+      PAPERLESS_SOCIALACCOUNT_PROVIDERS: >
+        {
+          "openid_connect": {
+            "APPS": [
+              {
+                "provider_id": "authentik",
+                "name": "authentik",
+                "client_id": "paperless",
+                "secret": "${PAPERLESS_OIDC_CLIENT_SECRET}",
+                "settings": {
+                  "server_url": "https://auth.home.paillaugue.fr/application/o/paperless/.well-known/openid-configuration",
+                  "claims": {"username": "email"}
+                }
+              }
+            ],
+            "OAUTH_PKCE_ENABLED": "True"
+          }
+        }
+      PAPERLESS_AUTO_LOGIN: true
+      PAPERLESS_AUTO_CREATE: true
+      PAPERLESS_LOGOUT_REDIRECT_URL: "https://auth.home.paillaugue.fr/application/o/paperless/end-session/"
 
   gotenberg:
     image: docker.io/gotenberg/gotenberg:8.22
@@ -52,3 +76,16 @@ services:
   tika:
     image: docker.io/apache/tika:latest
     restart: unless-stopped
+
+  exporter:
+    image: ghcr.io/hansmi/prometheus-paperless-exporter:latest
+    restart: on-failure
+    init: true
+    ports:
+      - 8084:8081
+    env_file: .env
+    environment:
+      PAPERLESS_SERVER_TIMEZONE: ${PAPERLESS_TIME_ZONE}
+      PAPERLESS_AUTH_TOKEN_FILE: /etc/exporter/auth-token.txt
+    volumes:
+      - ./exporter-config/:/etc/exporter:ro

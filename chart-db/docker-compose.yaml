@@ -1,0 +1,7 @@
+services:
+  chart_db:
+    container_name: chart_db
+    image: ghcr.io/chartdb/chartdb:latest
+    ports:
+      - 8001:80
+    restart: unless-stopped

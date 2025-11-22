@@ -1,0 +1,39 @@
+services:
+  vaultwarden:
+    image: vaultwarden/server:latest
+    container_name: vaultwarden
+    restart: unless-stopped
+    environment:
+      DOMAIN: "https://vaultwarden.home.paillauguue.fr"
+#      SSO_ENABLED: true
+#      SSO_AUTHORITY: https://auth.home.paillaugue.fr/application/o/vaultwarden/
+#      SSO_CLIENT_ID: vaultwarden
+#      SSO_CLIENT_SECRET: ${SSO_SECRET}
+#      SSO_SCOPES: "openid email profile offline_access"
+#      SSO_ALLOW_UNKNOWN_EMAIL_VERIFICATION: false
+#      SSO_CLIENT_CACHE_EXPIRATION: 0
+#      SSO_ONLY: false # Set to true to disable email+master password login and require SSO
+#      SSO_SIGNUPS_MATCH_EMAIL: true # Match first SSO login to existing account by email
+    volumes:
+      - ./vaultwarden:/data/
+    ports:
+      - 8000:80
+
+#  cloudflare-tunnel:
+#    image: cloudflare/cloudflared:latest              # Pull the latest version of the Cloudflare Tunnel image
+#    container_name: cloudflare-tunnel                 # Name of the Cloudflare Tunnel container
+#    hostname: cloudflare-tunnel                       # Hostname for the Cloudflare Tunnel container
+#    restart: unless-stopped                           # Restart the container unless manually stopped
+#    network_mode: "host"                              # Use the host network (no isolation between host and container)
+#    command: tunnel run                               # Command to start the Cloudflare tunnel
+#    volumes:
+#      - /etc/localtime:/etc/localtime:ro              # Synchronize time with the host
+#      - ./config/hosts:/etc/hosts                     # Mount hosts file from host to container
+#    environment:
+#      - "TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}"     # Pass the Cloudflare Tunnel token from environment variable
+#    healthcheck:
+#      test: ["CMD", "cloudflared", "--version"]       # Check if cloudflared version command works
+#      interval: 30s                                   # Time between health check attempts
+#      timeout: 10s                                    # Time to wait for a response
+#      retries: 3                                      # Number of retries before marking as unhealthy
+#      start_period: 10s                               # Delay before health checks begin

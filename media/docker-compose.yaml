@@ -1,0 +1,175 @@
+services:
+  jellyfin:
+    image: jellyfin/jellyfin
+    container_name: jellyfin
+    network_mode: 'host'
+    environment:
+      - TZ=${TZ}
+      - NVIDIA_VISIBLE_DEVICES=all
+    volumes:
+      - ./Jellyfin/jellyfin-config:/config
+      - ./Jellyfin/jellyfin-cache:/cache
+      - type: bind
+        source: /mnt/storage/Jellyfin/Movies
+        target: /Movies
+      - type: bind
+        source: /mnt/storage/Jellyfin/Shows
+        target: /Show
+      - type: bind
+        source: /mnt/storage/Jellyfin/Porn
+        target: /Porn
+    restart: 'unless-stopped'
+    deploy:
+     resources:
+       reservations:
+         devices:
+           - capabilities: [gpu]
+
+  sonarr:
+    image: linuxserver/sonarr
+    container_name: sonarr
+    ports:
+      - "8090:8989"
+    volumes:
+      - ./Jellyfin/sonarr-config:/config
+      - /mnt/storage/Jellyfin/Movies/tv-sonarr:/downloads
+      - /mnt/storage/Jellyfin/Shows:/shows
+    environment:
+      - PUID=0
+      - PGID=0
+      - TZ=${TZ}
+    restart: unless-stopped
+
+  radarr:
+    image: linuxserver/radarr
+    container_name: radarr
+    ports:
+      - "8091:7878"
+    volumes:
+      - ./Jellyfin/radarr-config:/config
+      - /mnt/storage/Jellyfin/Movies:/movies
+      - /mnt/storage/Jellyfin/Movies/radarr:/downloads
+    environment:
+      - PUID=0
+      - PGID=0
+      - TZ=${TZ}
+    restart: unless-stopped
+
+  bazarr:
+    image: linuxserver/bazarr
+    container_name: bazarr
+    ports:
+      - "8092:6767"
+    volumes:
+      - ./Jellyfin/bazarr-config:/config
+      - /mnt/storage/Jellyfin/Movies:/movies
+      - /mnt/storage/Jellyfin/Shows:/shows
+    environment:
+      - PUID=0
+      - PGID=0
+      - TZ=${TZ}
+    restart: unless-stopped
+
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    environment:
+      - PUID=0
+      - PGID=0
+      - TZ=${TZ}
+    volumes:
+      - ./Jellyfin/prowlarr-config:/config
+    ports:
+      - 8096:9696
+    restart: unless-stopped
+
+  jacket:
+    image: linuxserver/jackett
+    container_name: jackett
+    ports:
+      - "8093:9117"
+    volumes:
+      - ./Jellyfin/jackett-config:/config
+      - /mnt/storage/Jellyfin/Incomplete:/downloads
+    environment:
+      - PUID=0
+      - PGID=0
+      - TZ=${TZ}
+    restart: unless-stopped
+
+  jellyseerr:
+    image: ghcr.io/fallenbagel/jellyseerr:latest
+    container_name: jellyseerr
+    environment:
+      - TZ=${TZ}
+    ports:
+      - 8094:5055
+    volumes:
+      - ./Jellyfin/jellyseerr-config/config:/app/config
+    restart: unless-stopped
+
+  vpn:
+    container_name: vpn
+    image: qmcgaw/gluetun:v3.38.0
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    environment:
+      - VPN_SERVICE_PROVIDER=surfshark
+      - VPN_TYPE=wireguard
+      - WIREGUARD_PRIVATE_KEY=${WIREGUARD_PRIVATE_KEY}
+      - WIREGUARD_ADDRESSES=10.14.0.2/16
+      - SERVER_COUNTRIES=France
+    ports:
+      - 8083:9091
+    restart: unless-stopped
+
+  transmission:
+    image: lscr.io/linuxserver/transmission:latest
+    container_name: transmission
+    network_mode: service:vpn
+    depends_on:
+      - vpn
+    environment:
+      - PUID=0
+      - PGID=0
+      - TZ=${TZ}
+    volumes:
+      - ./Jellyfin/transmission-config:/config
+      - /mnt/storage/Jellyfin/Incomplete:/Incomplete
+      - /mnt/storage/Jellyfin/Movies:/Movies
+      - /mnt/storage/Jellyfin/Shows:/Shows
+      - /mnt/storage/Jellyfin/Others:/Others
+    restart: unless-stopped
+
+  watcharr:
+    image: ghcr.io/sbondco/watcharr:latest
+    container_name: watcharr
+    ports:
+      - 8099:3080
+    volumes:
+      - ./watcharr:/data
+    restart: unless-stopped
+
+  ntfy:
+    image: binwiederhier/ntfy:v2.11.0
+    container_name: ntfy
+    command:
+      - serve
+    environment:
+      TZ: ${TZ}
+      NTFY_BASE_URL: http://192.168.0.3:8097
+      NTFY_AUTH_FILE: /var/lib/ntfy/user.db
+      NTFY_AUTH_DEFAULT_ACCESS: deny-all
+      NTFY_ENABLE_LOGIN: 'true'
+      NTFY_CACHE_FILE: /var/lib/ntfy/cache.db
+      NTFY_ATTACHMENT_CACHE_DIR: /var/lib/ntfy/attachments
+      NTFY_ENABLE_SIGNUP: false
+      NTFY_WEB_ROOT: disable
+    volumes:
+      - /var/cache/ntfy:/var/cache/ntfy
+      - ./ntfy/data:/var/lib/ntfy
+    ports:
+      - 8097:80
+    restart: unless-stopped

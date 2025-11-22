@@ -1,0 +1,31 @@
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: unless-stopped
+    user: 0:0
+    ports:
+      - "8105:3000"
+    volumes:
+      - ./grafana/data:/var/lib/grafana
+      - ./grafana.ini:/etc/grafana/grafana.ini
+    environment:
+      - GF_SERVER_ROOT_URL=https://grafana.home.paillaugue.fr/
+      - GF_AUTH_GENERIC_OAUTH_ENABLED=true
+      - GF_AUTH_GENERIC_OAUTH_AUTH_URL=https://auth.home.paillaugue.fr/application/o/authorize/
+      - GF_AUTH_GENERIC_OAUTH_TOKEN_URL=https://auth.home.paillaugue.fr/application/o/token/
+      - GF_AUTH_GENERIC_OAUTH_API_URL=https://auth.home.paillaugue.fr/application/o/userinfo/
+      - GF_AUTH_SIGNOUT_REDIRECT_URL=https://auth.home.paillaugue.fr/application/o/grafana/end-session/
+      - GF_AUTH_GENERIC_OAUTH_NAME=Authentik
+      - GF_AUTH_GENERIC_OAUTH_SCOPES=openid profile email
+      - GF_AUTH_OAUTH_AUTO_LOGIN=true
+      - GF_FEATURE_TOGGLES_FINEGRAINEDACCESSCONTROL=true

@@ -1,0 +1,29 @@
+services:
+  scrutiny:
+    restart: unless-stopped
+    container_name: scrutiny
+    image: ghcr.io/analogj/scrutiny:master-omnibus
+    cap_add:
+      - SYS_RAWIO
+    ports:
+      - "8101:8080" # webapp
+      - "8086:8086" # influxDB admin
+    volumes:
+      - /run/udev:/run/udev:ro
+      - ./config:/opt/scrutiny/config
+      - ./influxdb:/opt/scrutiny/influxdb
+    devices:
+      - "/dev/nvme0n1"
+      - "/dev/sda"
+      - "/dev/sdb"
+      - "/dev/sdc"
+      - "/dev/sdd"
+      - "/dev/sde"
+
+# My disks:
+# nvme0n1 (250GB SSD)
+# sda (1TB SSD) system
+# sdb (4TB HDD) storage (ZFS pool)
+# sdc (4TB HDD) unused
+# sdd (2TB HDD) unused
+# sde (4TB HDD) storage (ZFS pool)

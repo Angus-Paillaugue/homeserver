@@ -1,26 +1,10 @@
+# Ignore all nested directories (not files) of more than one level deep
+*/
+!/*/
+/*/*/
+
+# Special cases
 .env
-vega/immich
-Immich-backups
-vega/adguard
-vega/couchdb-*
-vega/nextcloud
-vega/vaultwarden
-swingmusic/.config
-saturn/kiwix
-paperless/consume
-paperless/data
-paperless/export
-paperless/media
-paperless/pgdata
-paperless/redisdata
-music/navidrome
-minecraft/vanilla
-mars/Jellyfin
-mars/ntfy
-mars/navidrome
-mars/watcharr
-libretranslate/libretranslate
-git/gitea
-git/postgres
-auth/tinyauth-data
-adguard/adguard
+grafana.ini
+radicale/users
+couch-db
