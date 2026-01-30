@@ -6,7 +6,9 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus/data:/prometheus
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./tokens/gitea.txt:/etc/prometheus/gitea_token.txt:ro
 
   grafana:
     image: grafana/grafana:latest
@@ -18,14 +20,14 @@ services:
     volumes:
       - ./grafana/data:/var/lib/grafana
       - ./grafana.ini:/etc/grafana/grafana.ini
-    environment:
-      - GF_SERVER_ROOT_URL=https://grafana.home.paillaugue.fr/
-      - GF_AUTH_GENERIC_OAUTH_ENABLED=true
-      - GF_AUTH_GENERIC_OAUTH_AUTH_URL=https://auth.home.paillaugue.fr/application/o/authorize/
-      - GF_AUTH_GENERIC_OAUTH_TOKEN_URL=https://auth.home.paillaugue.fr/application/o/token/
-      - GF_AUTH_GENERIC_OAUTH_API_URL=https://auth.home.paillaugue.fr/application/o/userinfo/
-      - GF_AUTH_SIGNOUT_REDIRECT_URL=https://auth.home.paillaugue.fr/application/o/grafana/end-session/
-      - GF_AUTH_GENERIC_OAUTH_NAME=Authentik
-      - GF_AUTH_GENERIC_OAUTH_SCOPES=openid profile email
-      - GF_AUTH_OAUTH_AUTO_LOGIN=true
-      - GF_FEATURE_TOGGLES_FINEGRAINEDACCESSCONTROL=true
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    ports:
+      - "9103:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro

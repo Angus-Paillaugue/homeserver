@@ -14,6 +14,10 @@ services:
       - GITEA__database__NAME=gitea
       - GITEA__database__USER=gitea
       - GITEA__database__PASSWD=${POSTGRES_PASSWORD}
+      - GITEA__metrics__ENABLED=true
+      - GITEA__metrics__ENABLED_ISSUE_BY_REPOSITORY=true
+      - GITEA__metrics__ENABLED_ISSUE_BY_LABEL=true
+      - GITEA__metrics__TOKEN=${GITEA_METRICS_TOKEN}
     restart: always
     networks:
       - gitea

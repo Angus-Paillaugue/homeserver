@@ -13,6 +13,8 @@ services:
       - .env
     ports:
       - 8082:2283
+      - 9105:8081
+      - 9107:8082
     depends_on:
       - redis
       - database

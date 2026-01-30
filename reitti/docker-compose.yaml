@@ -13,6 +13,7 @@ services:
         condition: service_healthy
     environment:
       PHOTON_BASE_URL: http://photon:2322
+      CUSTOM_TILES_SERVICE: https://basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png
   postgis:
     image: postgis/postgis:17-3.5-alpine
     environment:

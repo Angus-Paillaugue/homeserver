@@ -1,0 +1,19 @@
+
+services:
+ cloudflare-tunnel:
+   image: cloudflare/cloudflared:latest              # Pull the latest version of the Cloudflare Tunnel image
+   container_name: cloudflare-tunnel                 # Name of the Cloudflare Tunnel container
+   hostname: cloudflare-tunnel                       # Hostname for the Cloudflare Tunnel container
+   restart: unless-stopped                           # Restart the container unless manually stopped
+   network_mode: "host"                              # Use the host network (no isolation between host and container)
+   command: tunnel run                               # Command to start the Cloudflare tunnel
+   volumes:
+     - /etc/localtime:/etc/localtime:ro              # Synchronize time with the host
+   environment:
+     - "TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}"     # Pass the Cloudflare Tunnel token from environment variable
+   healthcheck:
+     test: ["CMD", "cloudflared", "--version"]       # Check if cloudflared version command works
+     interval: 30s                                   # Time between health check attempts
+     timeout: 10s                                    # Time to wait for a response
+     retries: 3                                      # Number of retries before marking as unhealthy
+     start_period: 10s                               # Delay before health checks begin
