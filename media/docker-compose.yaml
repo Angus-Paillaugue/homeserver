@@ -18,6 +18,9 @@ services:
       - type: bind
         source: /mnt/storage/Jellyfin/Porn
         target: /Porn
+      - type: bind
+        source: /mnt/storage/Music
+        target: /Music
     restart: 'unless-stopped'
     deploy:
      resources:
