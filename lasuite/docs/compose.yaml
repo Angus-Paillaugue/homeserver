@@ -1,6 +1,7 @@
 services:
   postgresql:
     image: postgres:16
+    container_name: lasuite_docs_postgresql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
       interval: 1s
@@ -15,13 +16,14 @@ services:
     volumes:
       - ./data/databases/backend:/var/lib/postgresql/data/pgdata
 
-  # TODO: switch to valkey
   redis:
-    image: redis:8
+    image: valkey/valkey:8.0
+    container_name: lasuite_docs_valkey
 
   backend:
     image: lasuite/impress-backend:latest
     user: ${DOCKER_USER:-1000}
+    container_name: lasuite_docs_backend
     restart: always
     environment:
       - DJANGO_CONFIGURATION=Production
@@ -47,6 +49,7 @@ services:
   y-provider:
     image: lasuite/impress-y-provider:latest
     user: ${DOCKER_USER:-1000}
+    container_name: lasuite_docs_y
     env_file:
       - env.d/s3
       - env.d/common
@@ -55,6 +58,7 @@ services:
   frontend:
     image: lasuite/impress-frontend:latest
     user: ${DOCKER_USER:-1000}
+    container_name: lasuite_docs_frontend
     entrypoint:
       - /docker-entrypoint.sh
     command: ["nginx", "-g", "daemon off;"]
@@ -72,6 +76,7 @@ services:
   garage:
     image: dxflrs/garage:v2.3.0
     restart: unless-stopped
+    container_name: lasuite_docs_garage
     command: /garage server --single-node --default-bucket
     volumes:
       - ./garage.toml:/etc/garage.toml

@@ -67,7 +67,7 @@ services:
     container_name: reitti_photon
     environment:
       - UPDATE_STRATEGY=PARALLEL
-      - REGION=fr #set your main country code here to save space or drop this line to fetch the whole index.
+      - REGION=fr
     volumes:
       - ./data/photon:/photon/data
 
