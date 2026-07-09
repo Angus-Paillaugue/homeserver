@@ -27,3 +27,19 @@ services:
     #   # DNSCrypt
     #   - '5443:5443/tcp'
     #   - '5443:5443/udp'
+
+  adguard-exporter:
+    image: ebrianne/adguard-exporter:latest
+    container_name: adguard-exporter
+    restart: 'unless-stopped'
+    environment:
+      - adguard_protocol=https
+      - adguard_hostname=adguard.home.paillaugue.fr
+      - adguard_username=${ADGUARD_USERNAME}
+      - adguard_password=${ADGUARD_PASSWORD}
+      - adguard_port=443
+      - interval=10s
+      - log_limit=10000
+      - server_port=9617
+    ports:
+      - 9617:9617

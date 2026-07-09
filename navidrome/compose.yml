@@ -1,0 +1,106 @@
+services:
+  navidrome:
+    image: deluan/navidrome:latest
+    container_name: navidrome
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - ./navidrome:/data
+      - /mnt/storage/Music:/music
+    networks:
+      - default
+      - proxy
+
+
+  # Audiomuse
+  am-redis:
+    image: redis:7-alpine
+    container_name: audiomuse-redis
+    volumes:
+      - am-redis-data:/data
+    restart: unless-stopped
+
+  am-postgres:
+    image: postgres:15-alpine
+    container_name: audiomuse-postgres
+    environment:
+      POSTGRES_USER: ${AM_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${AM_POSTGRES_PASSWORD}
+      POSTGRES_DB: "audiomusedb"
+    volumes:
+      - am-postgres-data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  am-ai-flask:
+    image: ghcr.io/neptunehub/audiomuse-ai:latest
+    container_name: audiomuse-ai-flask-app
+    ports:
+      - "8003:8000"
+    environment:
+      SERVICE_TYPE: "flask"
+      TZ: "${AM_TZ}"
+      MEDIASERVER_TYPE: "navidrome"
+      POSTGRES_USER: ${AM_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${AM_POSTGRES_PASSWORD}
+      POSTGRES_DB: "audiomusedb"
+      POSTGRES_HOST: "am-postgres"
+      POSTGRES_PORT: "5432"
+      REDIS_URL: "redis://am-redis:6379/0"
+      TEMP_DIR: "/app/temp_audio"
+      NVIDIA_VISIBLE_DEVICES: "all"
+      NVIDIA_DRIVER_CAPABILITIES: "compute,utility"
+      NAVIDROME_URL: "${AM_NAVIDROME_URL}"
+      NAVIDROME_USER: "${AM_NAVIDROME_USER}"
+      NAVIDROME_PASSWORD: "${AM_NAVIDROME_PASSWORD}"
+      AI_MODEL_PROVIDER: "${AM_AI_MODEL_PROVIDER}"
+      OLLAMA_SERVER_URL: "${AM_OLLAMA_SERVER_URL}"
+      OLLAMA_MODEL_NAME: "${AM_OLLAMA_MODEL_NAME}"
+    volumes:
+      - am-temp-audio-flask:/app/temp_audio
+    depends_on:
+      - am-redis
+      - am-postgres
+    restart: unless-stopped
+    networks:
+      - default
+      - proxy
+
+  am-ai-worker:
+    image: ghcr.io/neptunehub/audiomuse-ai:latest
+    container_name: audiomuse-ai-worker-instance
+    environment:
+      SERVICE_TYPE: "worker"
+      TZ: "${AM_TZ}"
+      MEDIASERVER_TYPE: "navidrome"
+      POSTGRES_USER: ${AM_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${AM_POSTGRES_PASSWORD}
+      POSTGRES_DB: "audiomusedb"
+      POSTGRES_HOST: "am-postgres"
+      POSTGRES_PORT: "5432"
+      REDIS_URL: "redis://am-redis:6379/0"
+      TEMP_DIR: "/app/temp_audio"
+      NVIDIA_VISIBLE_DEVICES: "all"
+      NVIDIA_DRIVER_CAPABILITIES: "compute,utility"
+      NAVIDROME_URL: "${AM_NAVIDROME_URL}"
+      NAVIDROME_USER: "${AM_NAVIDROME_USER}"
+      NAVIDROME_PASSWORD: "${AM_NAVIDROME_PASSWORD}"
+      AI_MODEL_PROVIDER: "${AM_AI_MODEL_PROVIDER}"
+      OLLAMA_SERVER_URL: "${AM_OLLAMA_SERVER_URL}"
+      OLLAMA_MODEL_NAME: "${AM_OLLAMA_MODEL_NAME}"
+    volumes:
+      - am-temp-audio-worker:/app/temp_audio
+    depends_on:
+      - am-redis
+      - am-postgres
+    restart: unless-stopped
+
+volumes:
+  am-redis-data:
+  am-postgres-data:
+  am-temp-audio-flask:
+  am-temp-audio-worker:
+
+
+networks:
+  proxy:
+    external: true

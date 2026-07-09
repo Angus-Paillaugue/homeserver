@@ -1,10 +1,9 @@
 networks:
   gitea:
     external: false
-
 services:
   server:
-    image: docker.gitea.com/gitea:1.24.5
+    image: docker.gitea.com/gitea:1.26.1
     container_name: gitea
     environment:
       - USER_UID=1000
@@ -26,11 +25,10 @@ services:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     ports:
-      - "4323:3000"
-      - "222:22"
+      - 4323:3000
+      - 222:22
     depends_on:
       - db
-
   db:
     image: docker.io/library/postgres:14
     restart: always
@@ -42,13 +40,12 @@ services:
       - gitea
     volumes:
       - ./postgres:/var/lib/postgresql/data
-
   gitea-mirror:
     image: ghcr.io/raylabshq/gitea-mirror:latest
     container_name: gitea-mirror
     restart: unless-stopped
     ports:
-      - "4321:4321"
+      - 4321:4321
     user: 0:0
     volumes:
       - ./gitea-mirror:/app/data
@@ -66,7 +63,13 @@ services:
       - PORT=4321
       - PUBLIC_BETTER_AUTH_URL=https://gitea-mirror.home.paillaugue.fr
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=3", "--spider", "http://localhost:4321/api/health"]
+      test:
+        - CMD
+        - wget
+        - --no-verbose
+        - --tries=3
+        - --spider
+        - http://localhost:4321/api/health
       interval: 30s
       timeout: 10s
       retries: 5

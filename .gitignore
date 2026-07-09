@@ -8,3 +8,4 @@
 grafana.ini
 radicale/users
 couch-db
+!prometheus/prometheus/prometheus.yml

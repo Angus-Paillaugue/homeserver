@@ -1,0 +1,84 @@
+services:
+  reitti:
+    image: dedicatedcode/reitti:latest
+    container_name: reitti
+    ports:
+      - 8103:8080
+    depends_on:
+      postgis:
+        condition: service_healthy
+        restart: true
+      redis:
+        condition: service_healthy
+      tile-cache:
+        condition: service_healthy
+    environment:
+      PHOTON_BASE_URL: http://photon:2322
+      POSTGIS_HOST: postgis
+      POSTGIS_PORT: 5432
+      POSTGIS_USER: ${POSTGRES_USER}
+      POSTGIS_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGIS_DB: ${POSTGRES_DB}
+      ADVERTISE_URI: https://reitti.home.paillaugue.fr
+      LOGGING_LEVEL: INFO
+      OIDC_ENABLED: true
+      OIDC_CLIENT_ID: ${OIDC_CLIENT_ID}
+      OIDC_CLIENT_SECRET: ${OIDC_CLIENT_SECRET}
+      OIDC_ISSUER_URI: ${OIDC_ISSUER_URI}
+      OIDC_SCOPE: openid,profile
+      OIDC_AUTHENTICATION_METHOD: client_secret_basic
+      OIDC_SIGN_UP_ENABLED: false
+      DISABLE_LOCAL_LOGIN: true
+      # CUSTOM_TILES_SERVICE: https://basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png
+
+  postgis:
+    image: postgis/postgis:17-3.5-alpine
+    container_name: reitti_postgis
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - ./data/postgis:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: reitti_redis
+    volumes:
+      - ./data/redis:/data
+    healthcheck:
+      test:
+        - CMD
+        - redis-cli
+        - ping
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  photon:
+    image: rtuszik/photon-docker:1.0.0
+    container_name: reitti_photon
+    environment:
+      - UPDATE_STRATEGY=PARALLEL
+      - REGION=fr #set your main country code here to save space or drop this line to fetch the whole index.
+    volumes:
+      - ./data/photon:/photon/data
+
+  tile-cache:
+    image: dedicatedcode/reitti-tile-cache:latest
+    restart: unless-stopped
+    container_name: reitti_tile_cache
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1/osm/0/0/0.png"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - ./data/tile-cache:/var/cache/nginx

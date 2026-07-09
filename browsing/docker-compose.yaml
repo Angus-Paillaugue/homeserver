@@ -22,6 +22,7 @@ services:
       - FOURGET_SERVER_NAME=Angus's server
     ports:
       - 8089:80
+
   kiwix-serve:
     image: ghcr.io/kiwix/kiwix-serve
     volumes:
@@ -29,4 +30,3 @@ services:
     ports:
       - 8102:8080
     command: "*.zim"
-networks: {}

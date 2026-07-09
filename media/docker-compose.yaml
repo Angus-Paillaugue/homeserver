@@ -18,15 +18,22 @@ services:
       - type: bind
         source: /mnt/storage/Jellyfin/Porn
         target: /Porn
-      - type: bind
-        source: /mnt/storage/Music
-        target: /Music
     restart: 'unless-stopped'
     deploy:
      resources:
        reservations:
          devices:
            - capabilities: [gpu]
+
+  jellyfin_exporter:
+    image: rebelcore/jellyfin-exporter:latest
+    container_name: jellyfin_exporter
+    command:
+      - '--jellyfin.address=http://jellyfin:8080'
+      - '--jellyfin.token=${JELLYFIN_EXPORTER_TOKEN}'
+    ports:
+      - '9594:9594'
+    restart: unless-stopped
 
   sonarr:
     image: linuxserver/sonarr
@@ -100,43 +107,51 @@ services:
       - TZ=${TZ}
     restart: unless-stopped
 
-  jellyseerr:
-    image: ghcr.io/fallenbagel/jellyseerr:latest
-    container_name: jellyseerr
+  seerr:
+    image: ghcr.io/seerr-team/seerr:latest
+    container_name: seerr
     environment:
       - TZ=${TZ}
     ports:
       - 8094:5055
     volumes:
-      - ./Jellyfin/jellyseerr-config/config:/app/config
+      - ./Jellyfin/seerr-config/config:/app/config
     restart: unless-stopped
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:5055/api/v1/status || exit 1
+      start_period: 20s
+      timeout: 3s
+      interval: 15s
+      retries: 3
 
-  vpn:
-    container_name: vpn
-    image: qmcgaw/gluetun:v3.38.0
-    cap_add:
-      - NET_ADMIN
-    devices:
-      - /dev/net/tun:/dev/net/tun
-    environment:
-      - VPN_SERVICE_PROVIDER=surfshark
-      - VPN_TYPE=wireguard
-      - WIREGUARD_PRIVATE_KEY=${WIREGUARD_PRIVATE_KEY}
-      - WIREGUARD_ADDRESSES=10.14.0.2/16
-      - SERVER_COUNTRIES=France
-    ports:
-      - 8083:9091
-    restart: unless-stopped
+  # vpn:
+  #   container_name: vpn
+  #   image: qmcgaw/gluetun:v3.38.0
+  #   cap_add:
+  #     - NET_ADMIN
+  #   devices:
+  #     - /dev/net/tun:/dev/net/tun
+  #   environment:
+  #     - VPN_SERVICE_PROVIDER=surfshark
+  #     - VPN_TYPE=wireguard
+  #     - WIREGUARD_PRIVATE_KEY=${WIREGUARD_PRIVATE_KEY}
+  #     - WIREGUARD_ADDRESSES=10.14.0.2/16
+  #     - SERVER_COUNTRIES=France
+  #   ports:
+  #     - 8083:9091
+  #   restart: unless-stopped
 
   transmission:
     image: lscr.io/linuxserver/transmission:latest
     container_name: transmission
-    network_mode: service:vpn
-    depends_on:
-      - vpn
+    # network_mode: service:vpn
+    # depends_on:
+      # - vpn
+    ports:
+      - 9091:9091
     environment:
-      - PUID=0
-      - PGID=0
+      # - PUID=0
+      # - PGID=0
       - TZ=${TZ}
     volumes:
       - ./Jellyfin/transmission-config:/config
@@ -162,7 +177,7 @@ services:
       - serve
     environment:
       TZ: ${TZ}
-      NTFY_BASE_URL: http://192.168.0.3:8097
+      NTFY_BASE_URL: https://ntfy.home.paillaugue.fr
       NTFY_AUTH_FILE: /var/lib/ntfy/user.db
       NTFY_AUTH_DEFAULT_ACCESS: deny-all
       NTFY_ENABLE_LOGIN: 'true'

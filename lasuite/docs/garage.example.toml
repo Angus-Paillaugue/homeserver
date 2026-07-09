@@ -1,0 +1,14 @@
+metadata_dir = "/var/lib/garage/meta"
+data_dir = "/var/lib/garage/data"
+db_engine = "lmdb"
+
+
+rpc_bind_addr = "[::]:3901"
+rpc_public_addr = "[::]:3901"
+rpc_secret = "..." # Generate aa key with `openssl rand -hex 32`
+
+replication_factor = 1
+
+[s3_api]
+s3_region = "garage"
+api_bind_addr = "[::]:3900"

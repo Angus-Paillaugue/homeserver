@@ -1,0 +1,83 @@
+services:
+  postgresql:
+    image: postgres:16
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      interval: 1s
+      timeout: 2s
+      retries: 300
+    env_file:
+      - env.d/s3
+      - env.d/postgresql
+      - env.d/common
+    environment:
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - ./data/databases/backend:/var/lib/postgresql/data/pgdata
+
+  # TODO: switch to valkey
+  redis:
+    image: redis:8
+
+  backend:
+    image: lasuite/impress-backend:latest
+    user: ${DOCKER_USER:-1000}
+    restart: always
+    environment:
+      - DJANGO_CONFIGURATION=Production
+    env_file:
+      - env.d/s3
+      - env.d/common
+      - env.d/backend
+      - env.d/yprovider
+      - env.d/postgresql
+    healthcheck:
+      test: ["CMD", "python", "manage.py", "check"]
+      interval: 15s
+      timeout: 30s
+      retries: 20
+      start_period: 10s
+    depends_on:
+      postgresql:
+        condition: service_healthy
+        restart: true
+      redis:
+        condition: service_started
+
+  y-provider:
+    image: lasuite/impress-y-provider:latest
+    user: ${DOCKER_USER:-1000}
+    env_file:
+      - env.d/s3
+      - env.d/common
+      - env.d/yprovider
+
+  frontend:
+    image: lasuite/impress-frontend:latest
+    user: ${DOCKER_USER:-1000}
+    entrypoint:
+      - /docker-entrypoint.sh
+    command: ["nginx", "-g", "daemon off;"]
+    env_file:
+      - env.d/s3
+      - env.d/common
+    ports:
+      - "10200:8083"
+    volumes:
+      - ./default.conf.template:/etc/nginx/templates/docs.conf.template
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  garage:
+    image: dxflrs/garage:v2.3.0
+    restart: unless-stopped
+    command: /garage server --single-node --default-bucket
+    volumes:
+      - ./garage.toml:/etc/garage.toml
+      - ./data/garage/meta:/var/lib/garage/meta
+      - ./data/garage/data:/var/lib/garage/data
+    ports:
+      - "10201:3900"
+    env_file:
+      - env.d/s3
