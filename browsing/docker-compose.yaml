@@ -13,6 +13,7 @@ services:
     ports:
       - 8088:8080
     env_file: ./glance/.env
+
   fourget:
     image: luuul/4get:latest
     container_name: fourget

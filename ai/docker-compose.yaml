@@ -34,8 +34,27 @@ services:
       - ./ollama:/root/.ollama
     restart: unless-stopped
 
-  edge-tts:
-    image: travisvn/openai-edge-tts:latest
-    container_name: edge-tts
+  faster-whisper:
+    image: lscr.io/linuxserver/faster-whisper:gpu
+    container_name: faster-whisper
+    gpus: all
+    volumes:
+      - ./faster-whisper/data:/config
     ports:
-      - "5050:5050"
+      - 10300:10300
+    restart: unless-stopped
+    environment:
+      - WHISPER_LANG=fr
+      - WHISPER_MODEL=base
+
+  piper:
+    container_name: piper
+    image: rhasspy/wyoming-piper
+    gpus: all
+    restart: unless-stopped
+    ports:
+      - 10200:10200
+    volumes:
+      - ./piper:/data
+    command: --voice fr_FR-berth-medium
+    

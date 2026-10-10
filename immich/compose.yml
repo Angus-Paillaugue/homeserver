@@ -40,7 +40,7 @@ services:
 
   redis:
     container_name: immich_redis
-    image: docker.io/redis:6.2-alpine@sha256:2d1463258f2764328496376f5d965f20c6a67f66ea2b06dc42af351f75248792
+    image: docker.io/valkey/valkey:9@sha256:4963247afc4cd33c7d3b2d2816b9f7f8eeebab148d29056c2ca4d7cbc966f2d9
     healthcheck:
       test: redis-cli ping || exit 1
     restart: always
@@ -55,7 +55,6 @@ services:
       POSTGRES_DB: ${IMMICH_DB_DATABASE_NAME}
       POSTGRES_INITDB_ARGS: '--data-checksums'
       DB_STORAGE_TYPE: 'HDD'
-      glance.hide: false
     volumes:
       - ${IMMICH_DB_DATA_LOCATION}:/var/lib/postgresql/data
     restart: always

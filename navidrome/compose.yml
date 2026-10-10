@@ -11,7 +11,6 @@ services:
       - default
       - proxy
 
-
   # Audiomuse
   am-redis:
     image: redis:7-alpine
@@ -99,7 +98,6 @@ volumes:
   am-postgres-data:
   am-temp-audio-flask:
   am-temp-audio-worker:
-
 
 networks:
   proxy:

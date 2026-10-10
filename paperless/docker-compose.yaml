@@ -2,12 +2,14 @@ services:
   broker:
     image: docker.io/library/redis:8
     restart: unless-stopped
+    container_name: paperless-broker
     volumes:
       - ./redisdata:/data
 
   db:
     image: docker.io/library/postgres:17
     restart: unless-stopped
+    container_name: paperless-db
     volumes:
       - ./pgdata:/var/lib/postgresql/data
     environment:
@@ -16,8 +18,9 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
 
   webserver:
-    image: ghcr.io/paperless-ngx/paperless-ngx:latest
+    image: ghcr.io/paperless-ngx/paperless-ngx:${PAPERLESS_VERSION}
     restart: unless-stopped
+    container_name: paperless-webserver
     user: 0:0
     depends_on:
       - db
@@ -34,6 +37,7 @@ services:
     env_file: .env
     environment:
       PAPERLESS_REDIS: redis://broker:6379
+      PAPERLESS_DBENGINE: postgresql
       PAPERLESS_DBHOST: db
       PAPERLESS_DBPASS: ${POSTGRES_PASSWORD}
       PAPERLESS_TIKA_ENABLED: 1
@@ -64,7 +68,8 @@ services:
       PAPERLESS_LOGOUT_REDIRECT_URL: "https://auth.home.paillaugue.fr/application/o/paperless/end-session/"
 
   gotenberg:
-    image: docker.io/gotenberg/gotenberg:8.22
+    image: docker.io/gotenberg/gotenberg:8.37
+    container_name: paperless-gotenberg
     restart: unless-stopped
     # The gotenberg chromium route is used to convert .eml files. We do not
     # want to allow external content like tracking pixels or even javascript.
@@ -75,11 +80,13 @@ services:
 
   tika:
     image: docker.io/apache/tika:latest
+    container_name: paperless-tika
     restart: unless-stopped
 
   exporter:
     image: ghcr.io/hansmi/prometheus-paperless-exporter:latest
     restart: on-failure
+    container_name: paperless-exporter
     init: true
     ports:
       - 8084:8081

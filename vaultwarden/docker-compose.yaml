@@ -4,16 +4,7 @@ services:
     container_name: vaultwarden
     restart: unless-stopped
     environment:
-      DOMAIN: "https://vaultwarden.home.paillauguue.fr"
-#      SSO_ENABLED: true
-#      SSO_AUTHORITY: https://auth.home.paillaugue.fr/application/o/vaultwarden/
-#      SSO_CLIENT_ID: vaultwarden
-#      SSO_CLIENT_SECRET: ${SSO_SECRET}
-#      SSO_SCOPES: "openid email profile offline_access"
-#      SSO_ALLOW_UNKNOWN_EMAIL_VERIFICATION: false
-#      SSO_CLIENT_CACHE_EXPIRATION: 0
-#      SSO_ONLY: false # Set to true to disable email+master password login and require SSO
-#      SSO_SIGNUPS_MATCH_EMAIL: true # Match first SSO login to existing account by email
+      DOMAIN: "https://vaultwarden.home.paillaugue.fr"
     volumes:
       - ./vaultwarden:/data/
     ports:

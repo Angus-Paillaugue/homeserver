@@ -8,4 +8,7 @@
 grafana.ini
 radicale/users
 couch-db
-!prometheus/prometheus/prometheus.yml
+!observability/prometheus/prometheus.yml
+!git/renovate/config.ts
+!git/gitea-runner/config.yml
+!lasuite/docs
