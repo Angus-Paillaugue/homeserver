@@ -31,10 +31,6 @@ services:
               capabilities: [gpu]
               device_ids:
                 - nvidia.com/gpu=all
-#           - driver: nvidia
-#             count: 1
-#             capabilities:
-#               - gpu
 
   jellyfin_exporter:
     image: rebelcore/jellyfin-exporter:latest
@@ -157,7 +153,7 @@ services:
     container_name: transmission
     # network_mode: service:vpn
     # depends_on:
-    # - vpn
+      # - vpn
     ports:
       - 9091:9091
     environment:
@@ -186,7 +182,7 @@ services:
       NTFY_CACHE_FILE: /var/lib/ntfy/cache.db
       NTFY_ATTACHMENT_CACHE_DIR: /var/lib/ntfy/attachments
       NTFY_ENABLE_SIGNUP: false
-    # NTFY_WEB_ROOT: disable
+      # NTFY_WEB_ROOT: disable
     volumes:
       - /var/cache/ntfy:/var/cache/ntfy
       - ./ntfy/data:/var/lib/ntfy

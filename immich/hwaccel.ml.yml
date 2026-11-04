@@ -25,10 +25,6 @@ services:
               capabilities: [gpu]
               device_ids:
                 - nvidia.com/gpu=all
-#            - driver: nvidia
-#              count: 1
-#              capabilities:
-#                - gpu
 
   openvino:
     device_cgroup_rules:
