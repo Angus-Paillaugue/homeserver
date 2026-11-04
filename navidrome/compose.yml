@@ -93,6 +93,16 @@ services:
       - am-postgres
     restart: unless-stopped
 
+  music-assistant-server:
+    image: ghcr.io/music-assistant/server:latest
+    container_name: music-assistant-server
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - ./music-assistant-server/data:/data
+    environment:
+      - LOG_LEVEL=info
+
 volumes:
   am-redis-data:
   am-postgres-data:

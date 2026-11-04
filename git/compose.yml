@@ -82,7 +82,7 @@ services:
       - gitea
     volumes:
       - ./postgres_18:/var/lib/postgresql
-     
+
   # renovate:
   #   image: renovate/renovate
   #   container_name: renovate

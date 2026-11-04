@@ -1,0 +1,21 @@
+services:
+  couchdb:
+    image: couchdb:latest
+    container_name: obsidian-couchdb
+    env_file: .env
+    volumes:
+      - ./couchdb-data:/opt/couchdb/data
+      - ./livesync.ini:/opt/couchdb/etc/local.ini
+    ports:
+      - 5984:5984
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - "CMD-SHELL"
+        - >-
+          curl -fSs --max-time 4 --user "$${COUCHDB_USER}:$${COUCHDB_PASSWORD}"
+          http://127.0.0.1:5984/_session | grep -q "_admin"
+      interval: 5s
+      timeout: 5s
+      retries: 24
+      start_period: 20s

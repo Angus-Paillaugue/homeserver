@@ -27,7 +27,14 @@ services:
      resources:
        reservations:
          devices:
-           - capabilities: [gpu]
+            - driver: cdi
+              capabilities: [gpu]
+              device_ids:
+                - nvidia.com/gpu=all
+#           - driver: nvidia
+#             count: 1
+#             capabilities:
+#               - gpu
 
   jellyfin_exporter:
     image: rebelcore/jellyfin-exporter:latest
@@ -150,7 +157,7 @@ services:
     container_name: transmission
     # network_mode: service:vpn
     # depends_on:
-      # - vpn
+    # - vpn
     ports:
       - 9091:9091
     environment:
@@ -163,15 +170,6 @@ services:
       - /mnt/storage/Jellyfin/Movies:/Movies
       - /mnt/storage/Jellyfin/Shows:/Shows
       - /mnt/storage/Jellyfin/Others:/Others
-    restart: unless-stopped
-
-  watcharr:
-    image: ghcr.io/sbondco/watcharr:latest
-    container_name: watcharr
-    ports:
-      - 8099:3080
-    volumes:
-      - ./watcharr:/data
     restart: unless-stopped
 
   ntfy:
@@ -188,10 +186,10 @@ services:
       NTFY_CACHE_FILE: /var/lib/ntfy/cache.db
       NTFY_ATTACHMENT_CACHE_DIR: /var/lib/ntfy/attachments
       NTFY_ENABLE_SIGNUP: false
-      # NTFY_WEB_ROOT: disable
+    # NTFY_WEB_ROOT: disable
     volumes:
       - /var/cache/ntfy:/var/cache/ntfy
       - ./ntfy/data:/var/lib/ntfy
     ports:
-      - 8097:80
+      - 8079:80
     restart: unless-stopped

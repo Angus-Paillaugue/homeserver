@@ -1,0 +1,11 @@
+services:
+  app:
+    image: nginx:alpine
+    restart: unless-stopped
+    ports:
+      - "8107:8080"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - "./robots.txt:/app/static/robots.txt:ro"
+      - "../syncthing/st-sync/books:/app/static/books:ro"
+      - "/mnt/storage/Jellyfin/Shows/South Park/Season 29/South.Park.S29E04.1080p.HEVC.x265-MeGusta[EZTVx.to].mkv:/app/static/shows/South Park/Season 29/s29e4.mkv:ro"
